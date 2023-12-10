@@ -12,7 +12,7 @@ TEXT_COLOR = "#000000"  # Black text color
 # GUI Setup
 root = tk.Tk()
 root.title("NFL Data App")
-root.geometry("800x800")
+root.geometry("850x800")
 
 
 # Create a Style object
@@ -122,10 +122,11 @@ for abbr, filename in team_logos_filenames.items():
 root.image_references = list(loaded_team_logos.values())
 
 # Load draft data
-draft_data = functions.load_draft_data('app/updated_draft_data_pm.csv')
+draft_data = functions.load_draft_data()
 
 # Setup Treeview
 tree = functions.setup_treeview(root)
+
 tree.bind('<<TreeviewSelect>>', lambda e: functions.on_tree_select(tree, team_logo_label, loaded_team_logos))
 
 
@@ -157,14 +158,14 @@ search_button.grid(row=0, column=4, padx=5, pady=5)
 
 # Detailed View Frame
 detailed_frame = ttk.Frame(root)
-detailed_frame.grid(row=3, column=0, columnspan=3, padx=1, pady=1, sticky='nsew')
+detailed_frame.grid(row=3, column=0, columnspan=3, padx=1, pady=1, sticky='ew')
 
 # Centered the detailed_frame within a single column
-detailed_frame.grid(row=3, column=1, columnspan=1, padx=1, pady=1, sticky='nsew')
+detailed_frame.grid(row=3, column=1, columnspan=1, padx=1, pady=1, sticky='ew')
 
 # Create a widget (e.g., label or frame) inside detailed_frame and center it
 widget_inside_detailed_frame = ttk.Label(detailed_frame, text="Centered Widget")
-widget_inside_detailed_frame.grid(row=0, column=0, padx=1, pady=1, sticky='nsew')
+widget_inside_detailed_frame.grid(row=0, column=0, padx=1, pady=1, sticky='ew')
 
 # Configure the widget to be centered horizontally and vertically
 detailed_frame.columnconfigure(0, weight=1)  # Center horizontally
@@ -191,9 +192,17 @@ button_texts_commands = {
     "Most Rec Yards": lambda: functions.show_filtered_data('rec_yards', tree, draft_data)
 }
 
+# add data button
+add_data_button = tk.Button(root, text="Add New Data",
+                            command=lambda: functions.open_data_entry_window(root, tree))
+add_data_button.grid(row=4, column=1, columnspan=1, padx=10, pady=10, sticky="ew")
+
+
 for text, command in button_texts_commands.items():
     functions.create_button(button_frame, text, command, 0, list(button_texts_commands.keys()).index(text))
 
 # Main loop
 if __name__ == "__main__":
+    functions.create_playerstats_table()  # Ensure the table is created
+    functions.load_csv_to_db('app/updated_draft_data_pm.csv')  # Load data from CSV
     root.mainloop()
